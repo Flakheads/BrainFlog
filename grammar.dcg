@@ -1,0 +1,15 @@
+head([]) --> [].
+head([H|T]) --> unit(H), head(T).
+
+% unit --> nilad.
+% unit --> monad.
+
+unit(one) --> "(",")".
+unit(height) --> "[","]".
+unit(pop) --> "{","}".
+unit(swap) --> "<",">".
+
+unit(push([H|T])) --> "(", unit(H), head(T), ")".
+unit(negative([H|T])) --> "[", unit(H), head(T), "]".
+unit(loop([H|T])) --> "{", unit(H), head(T), "}".
+unit(zero([H|T])) --> "<", unit(H), head(T), ">".

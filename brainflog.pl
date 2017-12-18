@@ -1,8 +1,23 @@
-% #!/usr/bin/env swipl
+#!/usr/bin/env swipl
 
-% :- initialization(main).
+:- use_module(library(readutil)).
+:- consult('grammar.dcg').
 
-% main(Argv) :-
+:- initialization(main).
+
+main([File|Argv]) :-
+	open(File,read,SrcFile),
+	read_line_to_codes(SrcFile,Src),
+	close(SrcFile),
+	phrase(head(SrcTree),Src),
+	run_contents(SrcTree,[],[],0,Out,_,_),
+	write(Out),nl.
+
+run_contents([],Left,Right,Scope,Left,Right,Scope).
+run_contents([H|T],LeftS,RightS,ScopeS,LeftF,RightF,ScopeF) :-
+	call(H,LeftS,RightS,ScopeS,LeftM,RightM,ScopeM),
+	run_contents(T,LeftM,RightM,ScopeM,LeftF,RightF,ScopeF).
+
 
 one(Left,Right,Scope,Left,Right,NewScope) :- plus(Scope,1,NewScope).
 
@@ -15,10 +30,6 @@ pop([Popend|Left],Right,Scope,Left,Right,NewScope) :- plus(Scope,Popend,NewScope
 
 swap(Left,Right,Scope,Right,Left,Scope).
 
-run_contents([],Left,Right,Scope,Left,Right,Scope).
-run_contents([H|T],LeftS,RightS,ScopeS,LeftF,RightF,ScopeF) :-
-	call(H,LeftS,RightS,ScopeS,LeftM,RightM,ScopeM),
-	run_contents(T,LeftM,RightM,ScopeM,LeftF,RightF,ScopeF).
 
 push(Contents,LeftS,RightS,ScopeS,[ScopeM|LeftF],RightF,ScopeF) :-
 	run_contents(Contents,LeftS,RightS,ScopeS,LeftF,RightF,ScopeF),

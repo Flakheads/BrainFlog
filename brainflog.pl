@@ -12,7 +12,8 @@ main([File|Argv]) :-
 	phrase(head(SrcTree),Src),
 	maplist(atom_number,Argv,Arguments),
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
-	write(Out),nl.
+	atomic_list_concat(Out,' ',Formattedoutput),
+	write(Formattedoutput),nl.
 
 run_contents([],Left,Right,Scope,Left,Right,Scope).
 run_contents([H|T],LeftS,RightS,ScopeS,LeftF,RightF,ScopeF) :-

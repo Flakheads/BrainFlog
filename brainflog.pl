@@ -10,7 +10,8 @@ main([File|Argv]) :-
 	read_line_to_codes(SrcFile,Src),
 	close(SrcFile),
 	phrase(head(SrcTree),Src),
-	run_contents(SrcTree,[],[],0,Out,_,_),
+	maplist(atom_number,Argv,Arguments),
+	run_contents(SrcTree,Arguments,[],0,Out,_,_),
 	write(Out),nl.
 
 run_contents([],Left,Right,Scope,Left,Right,Scope).

@@ -1,19 +1,21 @@
 #!/usr/bin/env swipl
 
-:- use_module(library(readutil)).
 :- consult('grammar.dcg').
 
 :- initialization(main).
 
 main([File|Argv]) :-
 	open(File,read,SrcFile),
-	read_line_to_codes(SrcFile,Src),
+	read_stream_to_codes(SrcFile,SrcText),
 	close(SrcFile),
+	include(brace,SrcText,Src),
 	phrase(head(SrcTree),Src),
 	maplist(atom_number,Argv,Arguments),
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
 	atomic_list_concat(Out,' ',Formattedoutput),
 	write(Formattedoutput),nl.
+
+brace(Code) :- member(Code, [40,41,60,62,91,93,123,125]).
 
 run_contents([],Left,Right,Scope,Left,Right,Scope).
 run_contents([H|T],LeftS,RightS,ScopeS,LeftF,RightF,ScopeF) :-

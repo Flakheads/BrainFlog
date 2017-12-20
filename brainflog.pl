@@ -3,16 +3,16 @@
 opt_spec([
 	[opt(ascii_out), shortflags(['A']), longflags(['ascii-out']),
 	 type(boolean), default(false), help('Outputs as ASCII characters')],
-	[opt(help), shortflags([h]), longflags('help'), type(boolean),
-	 default(false), help('Prints this menu and exits')]
+	[opt(help), shortflags(['h']), longflags('help'), type(boolean),
+	 default(false), help('Prints this menu and exits')],
+	[opt(execute), shortflags(['e']), longflags('execute'), type(boolean),
+	 default(false), help('Reads source from the first command line argument instead of file')]
 	]).
 
 main :-
 	opt_spec(OptSpec),
 	opt_arguments(OptSpec, Opts, [File|Argv]),
-	open(File,read,SrcFile),
-	read_stream_to_codes(SrcFile,SrcText),
-	close(SrcFile),
+	get_src(File,SrcText,Opts),
 	include(brace,SrcText,Src),
 	phrase(head(SrcTree),Src),
 	maplist(read_arg,Argv,RaggedArgs),
@@ -21,7 +21,17 @@ main :-
 	format_output(Out,Formattedoutput,Opts),
 	write(Formattedoutput),nl.
 
-format_output(Out,Formattedoutput,Opts) :- member(ascii_out(true),Opts), string_codes(Formattedoutput,Out).
+get_src(File,SrcText,Opts) :- 
+	member(execute(true),Opts),
+	atom_to_chars(File,SrcText).
+get_src(File,SrcText,Opts) :- 
+	open(File,read,SrcFile),
+	read_stream_to_codes(SrcFile,SrcText),
+	close(SrcFile).
+
+format_output(Out,Formattedoutput,Opts) :-
+	member(ascii_out(true),Opts),
+	string_codes(Formattedoutput,Out).
 format_output(Out,Formattedoutput,_) :- atomic_list_concat(Out,' ',Formattedoutput).
 
 read_arg(Arg,[X]):-atom_number(Arg,X).

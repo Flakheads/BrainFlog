@@ -1,4 +1,4 @@
 # BrainFlog
 A Prolog interpreter for Brain-Flak
 
-Run the interpreter by executing brainflog.pl
+Compile with `swipl -g main -t halt -c brainflog.pl`

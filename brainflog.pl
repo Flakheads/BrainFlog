@@ -1,10 +1,7 @@
-#!/usr/bin/env swipl
-
 :- consult('grammar.dcg').
 
-:- initialization(main).
-
-main([File|Argv]) :-
+main :-
+	current_prolog_flag(argv, [File|Argv]),
 	open(File,read,SrcFile),
 	read_stream_to_codes(SrcFile,SrcText),
 	close(SrcFile),

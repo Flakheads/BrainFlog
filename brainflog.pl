@@ -1,7 +1,15 @@
 :- consult('grammar.dcg').
 
+opt_spec([
+	[opt(ascii_out), shortflags(['A']), longflags(['ascii-out']),
+	 type(boolean), default(false), help('Outputs as ASCII characters')],
+	[opt(help), shortflags([h]), longflags('help'), type(boolean),
+	 default(false), help('Prints this menu and exits')]
+	]).
+
 main :-
-	current_prolog_flag(argv, [File|Argv]),
+	opt_spec(OptSpec),
+	opt_arguments(OptSpec, Opts, [File|Argv]),
 	open(File,read,SrcFile),
 	read_stream_to_codes(SrcFile,SrcText),
 	close(SrcFile),
@@ -12,6 +20,7 @@ main :-
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
 	atomic_list_concat(Out,' ',Formattedoutput),
 	write(Formattedoutput),nl.
+
 
 read_arg(Arg,[X]):-atom_number(Arg,X).
 read_arg(Arg,X):-append([39|X],[39],Y),atom_to_chars(Arg,Y).

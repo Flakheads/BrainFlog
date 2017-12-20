@@ -10,10 +10,15 @@ main([File|Argv]) :-
 	close(SrcFile),
 	include(brace,SrcText,Src),
 	phrase(head(SrcTree),Src),
-	maplist(atom_number,Argv,Arguments),
+	maplist(read_arg,Argv,RaggedArgs),
+	append(RaggedArgs,Arguments),
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
 	atomic_list_concat(Out,' ',Formattedoutput),
 	write(Formattedoutput),nl.
+
+read_arg(Arg,[X]):-atom_number(Arg,X).
+read_arg(Arg,X):-append([39|X],[39],Y),atom_to_chars(Arg,Y).
+read_arg(Arg,X):-append([34|X],[34],Y),atom_to_chars(Arg,Y).
 
 brace(Code) :- member(Code, [40,41,60,62,91,93,123,125]).
 

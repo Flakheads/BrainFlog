@@ -18,9 +18,11 @@ main :-
 	maplist(read_arg,Argv,RaggedArgs),
 	append(RaggedArgs,Arguments),
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
-	atomic_list_concat(Out,' ',Formattedoutput),
+	format_output(Out,Formattedoutput,Opts),
 	write(Formattedoutput),nl.
 
+format_output(Out,Formattedoutput,Opts) :- member(ascii_out(true),Opts), string_codes(Formattedoutput,Out).
+format_output(Out,Formattedoutput,_) :- atomic_list_concat(Out,' ',Formattedoutput).
 
 read_arg(Arg,[X]):-atom_number(Arg,X).
 read_arg(Arg,X):-append([39|X],[39],Y),atom_to_chars(Arg,Y).

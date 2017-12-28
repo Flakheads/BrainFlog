@@ -24,7 +24,7 @@ main :-
 get_src(File,SrcText,Opts) :- 
 	member(execute(true),Opts),
 	atom_to_chars(File,SrcText).
-get_src(File,SrcText,Opts) :- 
+get_src(File,SrcText,_) :- 
 	open(File,read,SrcFile),
 	read_stream_to_codes(SrcFile,SrcText),
 	close(SrcFile).

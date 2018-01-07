@@ -3,15 +3,19 @@
 opt_spec([
 	[opt(ascii_out), shortflags(['A']), longflags(['ascii-out']),
 	 type(boolean), default(false), help('Outputs as ASCII characters')],
-	[opt(help), shortflags(['h']), longflags('help'), type(boolean),
+	[opt(help), shortflags(['h']), longflags(['help']), type(boolean),
 	 default(false), help('Prints this menu and exits')],
-	[opt(execute), shortflags(['e']), longflags('execute'), type(boolean),
+	[opt(execute), shortflags(['e']), longflags(['execute']), type(boolean),
 	 default(false), help('Reads source from the first command line argument instead of file')]
 	]).
 
 main :-
 	opt_spec(OptSpec),
-	opt_arguments(OptSpec, Opts, [File|Argv]),
+	opt_arguments(OptSpec, Opts, Args),
+	(member(help(true),Opts)->
+	opt_help(OptSpec,HelpText),
+	write(HelpText);
+	Args=[File|Argv],
 	get_src(File,SrcText,Opts),
 	include(brace,SrcText,Src),
 	phrase(head(SrcTree),Src),
@@ -19,7 +23,7 @@ main :-
 	append(RaggedArgs,Arguments),
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
 	format_output(Out,Formattedoutput,Opts),
-	write(Formattedoutput),nl.
+	write(Formattedoutput),nl).
 
 get_src(File,SrcText,Opts) :- 
 	member(execute(true),Opts),

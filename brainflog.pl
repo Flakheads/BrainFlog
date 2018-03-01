@@ -42,7 +42,7 @@ read_arg(Arg,[X]):-atom_number(Arg,X).
 read_arg(Arg,X):-append([39|X],[39],Y),atom_to_chars(Arg,Y).
 read_arg(Arg,X):-append([34|X],[34],Y),atom_to_chars(Arg,Y).
 
-brace(Code) :- member(Code, [40,41,60,62,91,93,123,125]).
+brace(Code) :- member(Code, `()[]{}<>`).
 
 run_contents([],Left,Right,Scope,Left,Right,Scope).
 run_contents([H|T],LeftS,RightS,ScopeS,LeftF,RightF,ScopeF) :-

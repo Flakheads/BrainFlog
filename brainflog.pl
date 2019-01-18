@@ -3,15 +3,19 @@
 opt_spec([
 	[opt(ascii_out), shortflags(['A']), longflags(['ascii-out']),
 	 type(boolean), default(false), help('Outputs as ASCII characters')],
-	[opt(help), shortflags(['h']), longflags('help'), type(boolean),
+	[opt(help), shortflags(['h']), longflags(['help']), type(boolean),
 	 default(false), help('Prints this menu and exits')],
-	[opt(execute), shortflags(['e']), longflags('execute'), type(boolean),
+	[opt(execute), shortflags(['e']), longflags(['execute']), type(boolean),
 	 default(false), help('Reads source from the first command line argument instead of file')]
 	]).
 
 main :-
 	opt_spec(OptSpec),
-	opt_arguments(OptSpec, Opts, [File|Argv]),
+	opt_arguments(OptSpec, Opts, Args),
+	(member(help(true),Opts)->
+	opt_help(OptSpec,HelpText),
+	write(HelpText);
+	Args=[File|Argv],
 	get_src(File,SrcText,Opts),
 	include(brace,SrcText,Src),
 	phrase(head(SrcTree),Src),
@@ -19,12 +23,12 @@ main :-
 	append(RaggedArgs,Arguments),
 	run_contents(SrcTree,Arguments,[],0,Out,_,_),
 	format_output(Out,Formattedoutput,Opts),
-	write(Formattedoutput),nl.
+	write(Formattedoutput),nl).
 
 get_src(File,SrcText,Opts) :- 
 	member(execute(true),Opts),
 	atom_to_chars(File,SrcText).
-get_src(File,SrcText,Opts) :- 
+get_src(File,SrcText,_) :- 
 	open(File,read,SrcFile),
 	read_stream_to_codes(SrcFile,SrcText),
 	close(SrcFile).
@@ -38,7 +42,7 @@ read_arg(Arg,[X]):-atom_number(Arg,X).
 read_arg(Arg,X):-append([39|X],[39],Y),atom_to_chars(Arg,Y).
 read_arg(Arg,X):-append([34|X],[34],Y),atom_to_chars(Arg,Y).
 
-brace(Code) :- member(Code, [40,41,60,62,91,93,123,125]).
+brace(Code) :- member(Code, `()[]{}<>`).
 
 run_contents([],Left,Right,Scope,Left,Right,Scope).
 run_contents([H|T],LeftS,RightS,ScopeS,LeftF,RightF,ScopeF) :-
